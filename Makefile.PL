@@ -4,20 +4,49 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.31;
 
-WriteMakefile(
-  DISTNAME  => 'Bootylicious-Plugin-TocJquery',
-  NAME      => 'Bootylicious::Plugin::TocJquery',
-  AUTHOR    => "Konstantin\ Kapitanov\ \<perlovik\@gmail\.com\>",
-  ABSTRACT  => "load\ TOC\ \(Table\ of\ Contents\)\ jQuery\ plugin\.",
-  VERSION   => '0.04',
-  EXE_FILES => [ qw() ],
-  (eval { ExtUtils::MakeMaker->VERSION(6.31) } ? (LICENSE => 'perl') : ()),
-  PREREQ_PM    => {
-    "Mojo" => '0.999910',
-    "Bootylicious::Plugin::AjaxLibLoader" => '0.04',
+
+
+my %WriteMakefileArgs = (
+  'ABSTRACT' => 'load TOC (Table of Contents) jQuery plugin.',
+  'AUTHOR' => 'Konstantin Kapitanov <perlovik@gmail.com>',
+  'BUILD_REQUIRES' => {},
+  'CONFIGURE_REQUIRES' => {
+    'ExtUtils::MakeMaker' => '6.31'
   },
-  test => {TESTS => 't/*.t'}
+  'DISTNAME' => 'Bootylicious-Plugin-TocJquery',
+  'EXE_FILES' => [],
+  'LICENSE' => 'perl',
+  'NAME' => 'Bootylicious::Plugin::TocJquery',
+  'PREREQ_PM' => {
+    'Bootylicious::Plugin::AjaxLibLoader' => '0.05',
+    'Mojo' => '0.999910'
+  },
+  'VERSION' => '0.06',
+  'test' => {
+    'TESTS' => 't/*.t'
+  }
 );
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
 
